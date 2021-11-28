@@ -74,5 +74,23 @@ namespace WebAssembly
 
             Assert.AreEqual("Hello World (from WASM)\n", issue7Received.ToString());
         }
+
+        /// <summary>
+        /// Verifies proper functionality of the sample provided via https://github.com/RyanLamansky/dotnet-webassembly/issues/51 .
+        /// </summary>
+        [TestMethod]
+        public void Issue51()
+        {
+            using var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("WebAssembly.Samples.Issue51.wasm");
+            Assert.IsNotNull(stream);
+
+            var compiled = Compile.FromBinary<dynamic>(stream);
+            var instance = compiled(new ImportDictionary
+            {
+                { "env", "memory", new MemoryImport(() => new UnmanagedMemory(1, 2)) }
+            });
+
+            var exports = instance.Exports;
+        }
     }
 }
